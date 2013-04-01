@@ -5,13 +5,20 @@
         <!-- Side Bar -->
         <div class="large-4 small-12 columns">
           <div class="panel">
-            <h3>Create new room</h3>
-            <form>
+            <h3>New room</h3>
+            <form action="" method="post">
               <div class="row">
                 <div class="large-12 columns">
-                  <label for="roomname">Room name</label>
-                  <input name="roomname" type="text">
-                  <a class="button expand" href="#">Create</a>
+                  {%- if form.name.errors -%}
+                  <label for="name" class="error">Name</label>
+                  {{ form.name(class="error")|safe }}
+                  <small class="error">{{ form.name.errors|first }}</small>
+                  {% else %}
+                  <label for="name">Name</label>
+                  {{ form.name()|safe }}
+                  {%- endif %}
+                  {{ form.hidden_tag() }}
+                  <button type="submit" class="small button">Create</button>
                 </div>
               </div>
             </form>
@@ -24,22 +31,22 @@
         <div class="large-8 columns">
           <div class="row">
 
+            {%- for room in rooms -%}
+            <div class="large-4 small-6 columns">
+              <div class="panel">
+                <h4>{{ room.name }}</h4>
+                <h6 class="subheader">{{ room.users }} user(s)</h6>
+                <a class="small button expand" href="{{ url_for('room', room_id=room.id) }}">Join</a>
+              </div>
+            </div>
+            {% else %}
             <div id="noRoom" class="large-12 columns">
               <div class="panel">
-                <h5>No room is currently available</h5>
+                <h4>No room is currently available</h4>
                 <h6 class="subheader">Please create a new room first to participate.</h6>
               </div>
             </div>
-
-            <!--
-            <div class="large-4 small-6 columns">
-              <div class="panel">
-                <h5>Item Name</h5>
-                <h6 class="subheader">$000.00</h6>
-                <a class="small button expand" href="#">Join</a>
-              </div>
-            </div>
-            -->
+            {%- endfor %}
 
           </div>
           <!-- End Thumbnails -->
