@@ -15,10 +15,13 @@
         <div class="large-12 columns" id="focused-media-stream">
         </div>
       </div>
-      <div class="row" id="media-streams">
-        <div class="large-3 small-6 columns template">
-          <div class="flex-video">
-          </div>
+      <div class="row">
+        <div class="large-12 columns">
+          <ul class="small-block-grid-2 large-block-grid-5" id="media-streams">
+            <li class="template" style="display:none;">
+              <div class="flex-video"></div>
+            </li>
+          </ul>
         </div>
       </div>
 {% endblock -%}
@@ -49,20 +52,24 @@
 
         var container = $('#media-streams .template').clone();
         container.find('.flex-video').append(mediaElement);
-        container.appendTo('#media-streams').removeClass('template');
+        container.appendTo('#media-streams').removeClass('template').show();
+
+        $('#init-RTCMultiConnection').hide('fast');
       },
       onLocalStream: function (media) {
         var mediaElement = media.mediaElement;
 
         var container = $('#media-streams .template').clone();
         container.find('.flex-video').append(mediaElement);
-        container.appendTo('#media-streams').removeClass('template');
+        container.appendTo('#media-streams').removeClass('template').show();
+
+        $('#init-RTCMultiConnection').hide('fast');
       },
     });
 
     $('#init-RTCMultiConnection').click(function() {
       rtcMultiConnection.initSession();
-      this.disabled = true;
+      $(this).prop('disabled', true);
     });
   </script>
 {% endblock -%}

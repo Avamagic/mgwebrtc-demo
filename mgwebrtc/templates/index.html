@@ -3,7 +3,7 @@
 {%- block content -%}
       <div class="row">
         <!-- Side Bar -->
-        <div class="large-3 small-12 columns">
+        <div class="large-3 columns">
           <div class="panel">
             <h3>New room</h3>
             <form action="" method="post">
@@ -18,7 +18,7 @@
                   {{ form.name()|safe }}
                   {%- endif %}
                   {{ form.hidden_tag() }}
-                  <button type="submit" class="small button">Create</button>
+                  <button type="submit" class="small button expand">Create</button>
                 </div>
               </div>
             </form>
@@ -26,13 +26,10 @@
         </div>
         <!-- End Side Bar -->
 
-
-        <!-- Thumbnails -->
         <div class="large-9 columns">
-          <div class="row">
-
+          <ul class="small-block-grid-2 large-block-grid-3">
             {%- for room in rooms -%}
-            <div class="large-4 small-6 columns">
+            <li>
               <div class="panel">
                 <h4>{{ room.name }}</h4>
                 <h6 class="subheader">
@@ -40,17 +37,16 @@
                 </h6>
                 <a class="small button expand" href="{{ url_for('room', room_id=room.id) }}">Join</a>
               </div>
-            </div>
+            </li>
             {% else %}
-            <div id="noRoom" class="large-12 columns">
+            <li>
               <div class="panel">
                 <h4>No room is currently available</h4>
                 <h6 class="subheader">Please create a new room first to participate.</h6>
               </div>
-            </div>
+            </li>
             {%- endfor %}
-
-          </div>
+          </ul>
           <!-- End Thumbnails -->
 
           <!-- Managed By -->
