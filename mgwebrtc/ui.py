@@ -1,5 +1,5 @@
 from datetime import datetime
-import time
+import calendar
 import json
 from flask import render_template, redirect, url_for
 from flask.ext.wtf import Form, TextField, validators
@@ -7,6 +7,10 @@ from redis import StrictRedis, WatchError
 from mgwebrtc import app
 
 redis = StrictRedis()
+
+@app.template_filter('iso8601')
+def iso8601_filter(value, format='%Y-%m-%dT%H:%M:%SZ'):
+    return value.strftime(format)
 
 class RoomForm(Form):
     name = TextField('Name', [validators.Required()])
@@ -18,7 +22,7 @@ def create_or_get_room(name):
         return room_id
 
     # create room
-    created_at = int(time.mktime(datetime.utcnow().utctimetuple()))
+    created_at = calendar.timegm(datetime.utcnow().utctimetuple())
     with redis.pipeline() as pipe:
         while True:
             try:
@@ -70,6 +74,7 @@ def room(room_id):
         return render_template('room_not_exists.html')
     room_info_key = 'room:info:{}'.format(room_id)
     room_info = json.loads(redis.get(room_info_key))
+    room_info['created_at'] = datetime.utcfromtimestamp(room_info['created_at'])
     return render_template('room.html', room_id=room_id, room_info=room_info)
 
 @app.route('/events')

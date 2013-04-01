@@ -71,14 +71,16 @@
   </div>
 
   <script>
-    document.write('<script src=' +
-                            ('__proto__' in {} ? '{{ url_for('static', filename='js/vendor/zepto') }}' : '{{ url_for('static', filename='js/vendor/jquery') }}') +
-                            '.js><\/script>')
+    document.write('<script src="{{ url_for('static', filename='js/vendor/jquery.js') }}"><\/script>')
+    document.write('<script src="{{ url_for('static', filename='js/vendor/jquery.timeago.js') }}"><\/script>')
   </script>
   
   <script src="{{ url_for('static', filename='js/foundation.min.js') }}"></script>
   <script>
     $(document).foundation();
+    $(document).ready(function() {
+      $("time.timeago").timeago();
+    });
   </script>
 </body>
 </html>
