@@ -63,8 +63,9 @@ def index():
         rooms = []
     else:
         rooms = redis.mget(room_keys)
-        print [info for info in rooms]
         rooms = [json.loads(info) for info in rooms]
+        for room in rooms:
+            room['created_at'] = datetime.utcfromtimestamp(room['created_at'])
     return render_template('index.html', form=form, rooms=rooms)
 
 @app.route('/room/<room_id>')

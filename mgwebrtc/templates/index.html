@@ -3,7 +3,7 @@
 {%- block content -%}
       <div class="row">
         <!-- Side Bar -->
-        <div class="large-4 small-12 columns">
+        <div class="large-3 small-12 columns">
           <div class="panel">
             <h3>New room</h3>
             <form action="" method="post">
@@ -28,14 +28,16 @@
 
 
         <!-- Thumbnails -->
-        <div class="large-8 columns">
+        <div class="large-9 columns">
           <div class="row">
 
             {%- for room in rooms -%}
             <div class="large-4 small-6 columns">
               <div class="panel">
                 <h4>{{ room.name }}</h4>
-                <h6 class="subheader">{{ room.users }} user(s)</h6>
+                <h6 class="subheader">
+                  Created <time class="timeago" datetime="{{ room.created_at|iso8601 }}">{{ room.created_at }}</time>
+                </h6>
                 <a class="small button expand" href="{{ url_for('room', room_id=room.id) }}">Join</a>
               </div>
             </div>

@@ -7,14 +7,62 @@
           <h6 class="subheader">
             Created <time class="timeago" datetime="{{ room_info.created_at|iso8601 }}">{{ room_info.created_at }}</time>
           </h6>
+          <button class="small button" id="init-RTCMultiConnection"
+                  title="Only first person should click this button in the entire media session.">Open Session</button>
         </div>
       </div>
       <div class="row">
-        <div class="large-12 columns">
+        <div class="large-12 columns" id="focused-media-stream">
         </div>
       </div>
-      <div class="row">
-        <div class="large-12 columns">
+      <div class="row" id="media-streams">
+        <div class="large-3 small-6 columns template">
+          <div class="flex-video">
+          </div>
         </div>
       </div>
+{% endblock -%}
+
+{%- block more_body_script -%}
+  <script src="https://cdn.firebase.com/v0/firebase.js"></script>
+  <script src="{{ url_for('static', filename='js/vendor/RTCMultiConnection-v1.0.js') }}"></script>
+  <script>
+    var rtcMultiConnection = new RTCMultiConnection({
+      session: Session.AudioVideo,
+      direction: Direction.ManyToMany,
+      openSignalingChannel: function (config) {
+        var channel = config.channel || 'avamagic_room_' + {{ room_info.id }};
+        var socket = new Firebase('https://chat.firebaseIO.com/' + channel);
+        socket.channel = channel;
+        socket.on('child_added', function (data) {
+          config.onmessage && config.onmessage(data.val());
+        });
+        socket.send = function(data) {
+          this.push(data);
+        };
+        config.onopen && setTimeout(config.onopen, 1);
+        socket.onDisconnect().remove();
+        return socket;
+      },
+      onRemoteStream: function(media) {
+        var mediaElement = media.mediaElement;
+
+        var container = $('#media-streams .template').clone();
+        container.find('.flex-video').append(mediaElement);
+        container.appendTo('#media-streams').removeClass('template');
+      },
+      onLocalStream: function (media) {
+        var mediaElement = media.mediaElement;
+
+        var container = $('#media-streams .template').clone();
+        container.find('.flex-video').append(mediaElement);
+        container.appendTo('#media-streams').removeClass('template');
+      },
+    });
+
+    $('#init-RTCMultiConnection').click(function() {
+      rtcMultiConnection.initSession();
+      this.disabled = true;
+    });
+  </script>
 {% endblock -%}

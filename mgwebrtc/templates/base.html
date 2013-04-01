@@ -8,6 +8,11 @@
   <title>MGWebRTC Demo</title>
   <link rel="stylesheet" href="{{ url_for('static', filename='css/normalize.css') }}" />
   <link rel="stylesheet" href="{{ url_for('static', filename='css/foundation.css') }}" />
+  <style>
+    .template {
+      display: none;
+    }
+  </style>
   <script src="{{ url_for('static', filename='js/vendor/custom.modernizr.js') }}"></script>
 
   <!-- Fav and touch icons -->
@@ -70,17 +75,15 @@
     </div>
   </div>
 
-  <script>
-    document.write('<script src="{{ url_for('static', filename='js/vendor/jquery.js') }}"><\/script>')
-    document.write('<script src="{{ url_for('static', filename='js/vendor/jquery.timeago.js') }}"><\/script>')
-  </script>
-  
+  <script src="{{ url_for('static', filename='js/vendor/jquery.js') }}"></script>
   <script src="{{ url_for('static', filename='js/foundation.min.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/vendor/jquery.timeago.js') }}"></script>
   <script>
     $(document).foundation();
     $(document).ready(function() {
       $("time.timeago").timeago();
     });
   </script>
+  {%- block more_body_script %}{% endblock -%}
 </body>
 </html>
