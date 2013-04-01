@@ -33,11 +33,11 @@
     var rtcMultiConnection = new RTCMultiConnection({
       session: Session.AudioVideo,
       direction: Direction.ManyToMany,
-      openSignalingChannel: function (config) {
+      openSignalingChannel: function(config) {
         var channel = config.channel || 'avamagic_room_' + {{ room_info.id }};
         var socket = new Firebase('https://chat.firebaseIO.com/' + channel);
         socket.channel = channel;
-        socket.on('child_added', function (data) {
+        socket.on('child_added', function(data) {
           config.onmessage && config.onmessage(data.val());
         });
         socket.send = function(data) {
@@ -56,7 +56,7 @@
 
         $('#init-RTCMultiConnection').hide('fast');
       },
-      onLocalStream: function (media) {
+      onLocalStream: function(media) {
         var mediaElement = media.mediaElement;
 
         var container = $('#media-streams .template').clone();
