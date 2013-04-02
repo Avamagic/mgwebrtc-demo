@@ -35,7 +35,7 @@
                 <h6 class="subheader">
                   Created <time class="timeago" datetime="{{ room.created_at|iso8601 }}">{{ room.created_at }}</time>
                 </h6>
-                <a class="small button expand" href="{{ url_for('room', room_id=room.id) }}">Join</a>
+                <a class="small button expand" href="{{ url_for('.room', room_id=room.id) }}">Join</a>
               </div>
             </li>
             {% else %}
@@ -55,7 +55,7 @@
               <div class="panel">
                 <div class="row">
                   <div class="large-2 small-6 columns">
-                    <img src="static/img/owner.png">
+                    <img src="{{ url_for('static', filename='img/owner.png') }}">
                   </div>
                   <div class="large-10 small-6 columns">
                     <strong>This Site Is Managed By<hr/></strong>
