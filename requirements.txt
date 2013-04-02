@@ -2,6 +2,7 @@ Flask==0.9
 Flask-WTF==0.8.2
 Flask-Script==0.5.3
 redis==2.7.2
+-e git+https://github.com/surfly/gevent.git@1.0rc2#egg=gevent
 
 # for testing
 blinker==1.2

@@ -1,4 +1,5 @@
 from flask import Flask
+from gevent import monkey; monkey.patch_all()
 from .configs import DevConfig
 from .frontend import frontend
 
