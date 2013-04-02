@@ -29,10 +29,9 @@
 {% endblock -%}
 
 {%- block more_body_script -%}
-  <script src="https://cdn.firebase.com/v0/firebase.js"></script>
   <script src="{{ url_for('static', filename='js/vendor/RTCMultiConnection-v1.1.js') }}"></script>
   <script>
-    var conferencing = new RTCMultiConnection('avamagic_room_' + {{ room_info.id }});
+    var conferencing = new RTCMultiConnection({{ room_info.id }});
     conferencing.direction = 'many-to-many';
     conferencing.session = 'audio + video';
     conferencing.onstream = function(stream) {
@@ -44,7 +43,25 @@
 
       hideButtons();
     };
-    // TODO: use our own signaling mechanism
+    conferencing.openSignalingChannel = function(config) {
+      config = config || {};
+      channel = config.channel || self.channel || 'default-channel';
+      var socket = {};
+      socket.channel = channel;
+      socket.send = function(data) {
+        $.post('{{ url_for('pub', channel=room_info.id) }}', {message: JSON.stringify(data)});
+      };
+      socket.sse = new EventSource('{{ url_for('sub', channel=room_info.id) }}');
+      socket.sse.onmessage = function(event) {
+        config.onmessage && config.onmessage(JSON.parse(event.data));
+      };
+      config.onopen && setTimeout(config.onopen, 1);
+      // TODO: let others know I have disconnected
+      $(window).on('unload', function() {
+        socket.send('I disconnected');
+      });
+      return socket;
+    };
 
     $('#init-RTCMultiConnection').click(function() {
       conferencing.open();

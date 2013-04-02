@@ -1,7 +1,7 @@
 from datetime import datetime
 import calendar
 import json
-from flask import render_template, redirect, url_for
+from flask import render_template, redirect, url_for, request, Response
 from flask.ext.wtf import Form, TextField, validators
 from redis import StrictRedis, WatchError
 from mgwebrtc import app
@@ -85,3 +85,18 @@ def events():
 @app.route('/about')
 def about():
     return render_template('about.html')
+
+def event_stream(channel):
+    pubsub = redis.pubsub()
+    pubsub.subscribe('room:channel:{}'.format(channel))
+    for message in pubsub.listen():
+        yield 'data: %s\n\n' % message['data']
+
+@app.route('/pub/<channel>', methods=['POST',])
+def pub(channel):
+    redis.publish('room:channel:{}'.format(channel), request.form['message'])
+    return Response(json.dumps({'status': 'ok'}), mimetype='application/json')
+
+@app.route('/sub/<channel>')
+def sub(channel):
+    return Response(event_stream(channel), mimetype='text/event-stream')
