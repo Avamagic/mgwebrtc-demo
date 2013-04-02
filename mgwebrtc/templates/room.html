@@ -32,7 +32,7 @@
   <script src="https://cdn.firebase.com/v0/firebase.js"></script>
   <script src="{{ url_for('static', filename='js/vendor/RTCMultiConnection-v1.1.js') }}"></script>
   <script>
-    var conferencing = new RTCMultiConnection();
+    var conferencing = new RTCMultiConnection('avamagic_room_' + {{ room_info.id }});
     conferencing.direction = 'many-to-many';
     conferencing.session = 'audio + video';
     conferencing.onstream = function(stream) {
@@ -47,12 +47,12 @@
     // TODO: use our own signaling mechanism
 
     $('#init-RTCMultiConnection').click(function() {
-      conferencing.open('avamagic_room_' + {{ room_info.id }});
+      conferencing.open();
       disableButtons();
     });
 
     $('#join-RTCMultiConnection').click(function() {
-      conferencing.connect('avamagic_room_' + {{ room_info.id }});
+      conferencing.connect();
       disableButtons();
     });
 
