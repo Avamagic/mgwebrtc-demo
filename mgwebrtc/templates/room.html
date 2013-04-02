@@ -53,12 +53,15 @@
       };
       socket.sse = new EventSource('{{ url_for('sub', channel=room_info.id) }}');
       socket.sse.onmessage = function(event) {
-        config.onmessage && config.onmessage(JSON.parse(event.data));
+        var data = JSON.parse(event.data);
+        if (data.avamsg === 'bye')
+          cleanupDisconnectedStream();
+        else
+          config.onmessage && config.onmessage(data);
       };
       config.onopen && setTimeout(config.onopen, 1);
-      // TODO: let others know I have disconnected
       $(window).on('unload', function() {
-        socket.send('I disconnected');
+        socket.send({'avamsg': 'bye'});
       });
       return socket;
     };
@@ -81,6 +84,30 @@
     function hideButtons() {
       $('#init-RTCMultiConnection').hide('fast');
       $('#join-RTCMultiConnection').hide('fast');
+    }
+
+    /**
+     * I wish I know how to check the status of a video element.
+     * However, I don't. That's why I use a timer to check the currentTime to
+     * determine whether a video element is disconnected or not.
+     */
+    function cleanupDisconnectedStream() {
+      var WAIT_MS = 1000;
+
+      var startTime = {};
+      $('video').each(function(index) {
+        startTime[$(this).prop('src')] = $(this).prop('currentTime');
+      });
+
+      setTimeout(function() {
+        $('video').each(function(index) {
+          var start = startTime[$(this).prop('src')];
+          var now = $(this).prop('currentTime');
+          if ((now - start) * 1000 < WAIT_MS * 0.95) {
+            $(this).parents('li').remove();
+          }
+        });
+      }, WAIT_MS);
     }
   </script>
 {% endblock -%}
