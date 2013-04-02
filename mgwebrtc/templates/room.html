@@ -8,7 +8,9 @@
             Created <time class="timeago" datetime="{{ room_info.created_at|iso8601 }}">{{ room_info.created_at }}</time>
           </h6>
           <button class="small button" id="init-RTCMultiConnection"
-                  title="Only first person should click this button in the entire media session.">Open Session</button>
+                  title="Only first person should click this button in the entire media session.">Open session</button>
+          <button class="small button" id="join-RTCMultiConnection"
+                  title="Others should click this button to join.">Join session</button>
         </div>
       </div>
       <div class="row">
@@ -28,48 +30,40 @@
 
 {%- block more_body_script -%}
   <script src="https://cdn.firebase.com/v0/firebase.js"></script>
-  <script src="{{ url_for('static', filename='js/vendor/RTCMultiConnection-v1.0.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/vendor/RTCMultiConnection-v1.1.js') }}"></script>
   <script>
-    var rtcMultiConnection = new RTCMultiConnection({
-      session: Session.AudioVideo,
-      direction: Direction.ManyToMany,
-      openSignalingChannel: function(config) {
-        var channel = config.channel || 'avamagic_room_' + {{ room_info.id }};
-        var socket = new Firebase('https://chat.firebaseIO.com/' + channel);
-        socket.channel = channel;
-        socket.on('child_added', function(data) {
-          config.onmessage && config.onmessage(data.val());
-        });
-        socket.send = function(data) {
-          this.push(data);
-        };
-        config.onopen && setTimeout(config.onopen, 1);
-        socket.onDisconnect().remove();
-        return socket;
-      },
-      onRemoteStream: function(media) {
-        var mediaElement = media.mediaElement;
+    var conferencing = new RTCMultiConnection();
+    conferencing.direction = 'many-to-many';
+    conferencing.session = 'audio + video';
+    conferencing.onstream = function(stream) {
+      var mediaElement = stream.mediaElement;
 
-        var container = $('#media-streams .template').clone();
-        container.find('.flex-video').append(mediaElement);
-        container.appendTo('#media-streams').removeClass('template').show();
+      var container = $('#media-streams .template').clone();
+      container.find('.flex-video').append(mediaElement);
+      container.appendTo('#media-streams').removeClass('template').show();
 
-        $('#init-RTCMultiConnection').hide('fast');
-      },
-      onLocalStream: function(media) {
-        var mediaElement = media.mediaElement;
-
-        var container = $('#media-streams .template').clone();
-        container.find('.flex-video').append(mediaElement);
-        container.appendTo('#media-streams').removeClass('template').show();
-
-        $('#init-RTCMultiConnection').hide('fast');
-      },
-    });
+      hideButtons();
+    };
+    // TODO: use our own signaling mechanism
 
     $('#init-RTCMultiConnection').click(function() {
-      rtcMultiConnection.initSession();
-      $(this).prop('disabled', true);
+      conferencing.open('avamagic_room_' + {{ room_info.id }});
+      disableButtons();
     });
+
+    $('#join-RTCMultiConnection').click(function() {
+      conferencing.connect('avamagic_room_' + {{ room_info.id }});
+      disableButtons();
+    });
+
+    function disableButtons() {
+      $('#init-RTCMultiConnection').prop('disabled', true);
+      $('#join-RTCMultiConnection').prop('disabled', true);
+    }
+
+    function hideButtons() {
+      $('#init-RTCMultiConnection').hide('fast');
+      $('#join-RTCMultiConnection').hide('fast');
+    }
   </script>
 {% endblock -%}
